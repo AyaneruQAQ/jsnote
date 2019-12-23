@@ -132,6 +132,14 @@ let a2 = [...a1]
 //如果数组所有项都为非引用类型，则slice(0)可以视作深拷贝，反之则不行
 ```
 
+###### 16.concat不改变原数组
+
+```
+let a = [1,2,3]
+a.concat(4)
+//此时a=[1,2,3],没有改变
+```
+
 
 
 ###### 17.input框绑定键盘enter事件
@@ -447,6 +455,21 @@ ajax('GET','/user','')
 '11'-1 //10
 ```
 
+###### 39.js的addEventListener与removeEventListener
+
+```js
+window.addEventListener('scroll',this.handleScroll)
+//等同于onScroll
+window.removeEventListener('scroll',this.handleScroll)
+//移除事件监听的时候要指定后面的函数，否则不行。因此add的时候不能使用匿名函数
+```
+
+40.es6动态改变元素类名
+
+```jsx
+<div className={`test ${tiaojian?'active':''}`}></div>
+```
+
 
 
 # TypeScript
@@ -500,13 +523,101 @@ let strLength: number = (someValue as string).length;
 
 
 
-# 自配置webpack+react
+# [webpack](https://webpack.docschina.org/concepts/)
 
-1.引入antd组件的时候报错：主要问题是配置loader的时候要按顺序写。style-loader、css-loader、less-loader
+###### 1.config引入css-loader顺序
 
-2.create-react-app搭建的脚手架，需要run eject才能暴露出配置文件
+​	主要问题是配置loader的时候要按顺序写。style-loader、css-loader、less-loader
+
+###### 2.create-react-app搭建的脚手架，需要run eject才能暴露出配置文件
+
+###### 3.webpack entry
+
+​	单页面应用一个入口，多页面应用可以配置多个入口
 
 
+
+​	entry传入一个数组？
+
+```
+entry:{
+	main:['./app.js','lodash']
+}
+```
+
+​	**数组中的文件一般是没有相互依赖关系的，但是又处于某些原因需要将它们打包在一起。(即多个文件打包成一个chunk)**
+
+###### 4.如果要根据 webpack.config.js 中的 **mode** 变量更改打包行为，则必须将配置导出为一个函数，而不是导出为一个对象：
+
+```js
+var config = {
+  entry: './app.js'
+  //...
+};
+
+module.exports = (env, argv) => {
+  if (argv.mode === 'development') {
+    config.devtool = 'source-map';
+  }
+  if (argv.mode === 'production') {
+    //...
+  }
+  return config;
+};
+```
+
+​	自我理解：相当于配置多个config文件，如：webpack.config.pro.js，webpack.config.dev.js
+
+###### 5.缓存优化相关配置
+
+​	浏览器通过命中缓存，降低网络流量。=>bundle分离。
+
+​	按如下方法
+
+​	1.输出文件文件名使用可替换模板字符串：
+
+```
+output:{
+	filename:'[name].[contenthash].js',
+}
+```
+
+​	2.bundle分离
+
+```js
+    optimization: {
+     runtimeChunk: 'single',//将webpack运行时引导代码提取出来一个单独的bundle
+     splitChunks: {//分离静态依赖模块
+       cacheGroups: {
+         vendor: {
+           test: /[\\/]node_modules[\\/]/,
+           name: 'vendors',
+           chunks: 'all'
+         }
+       }
+     }
+    }
+```
+
+​	此时修改本地依赖（自己的代码）,vendors输出文件的hash值还是会变，期望是不变的（这样缓存才能命中）。可以加入以下内容
+
+```js
+const webpack = require('webpack')
+
+plugins:[
+	new webpack.HashedModuleIdsPlugin()
+]
+```
+
+###### 6.webpack详细配置参数
+
+​	[webpack](https://webpack.docschina.org/configuration/output/)
+
+###### 7.模块热替换HMR（局部刷新，无需全部刷新）
+
+​	只配置devserver可以实现自动刷新，但是是完全刷新的。
+
+​	[react插件react-hot-loader](https://github.com/gaearon/react-hot-loader)，使用babel的方式
 
 # Git学习
 
@@ -556,6 +667,8 @@ git push
 
 18.本地代码上传：1.远程创建仓库tests；2.本地如下操作
 
+**注意：远程创建仓库的时候不要添加readme**
+
 ![](./1575273396358.png)
 
 ​	-u后续推送只需要git push
@@ -566,7 +679,7 @@ git push
 git clone -b branchname ssh://....
 ```
 
-
+20.git stash暂存    git stash pop（弹出：出栈）/apply(取出，不出栈)
 
 # CSS问题
 
@@ -1048,3 +1161,13 @@ localhost#id
 ###### 2.slot
 
 ​	插槽：自定义组件预留位置，以便扩展，通过name属性对应
+
+# 正则表达式
+
+###### 1.校验电话号码
+
+```js
+ var myreg = /^[1][3,4,5,7,8][0-9]{9}$/;
+ myreg.test(15851899798)
+```
+
