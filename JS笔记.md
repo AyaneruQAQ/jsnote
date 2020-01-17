@@ -464,10 +464,35 @@ window.removeEventListener('scroll',this.handleScroll)
 //移除事件监听的时候要指定后面的函数，否则不行。因此add的时候不能使用匿名函数
 ```
 
-40.es6动态改变元素类名
+###### 40.es6动态改变元素类名
 
 ```jsx
 <div className={`test ${tiaojian?'active':''}`}></div>
+```
+
+###### 41.js判断数组维度
+
+一维二维
+
+```js
+const tf = arr => arr.some(item=> item instanceof Array)
+tf(arr)//true则为二维数组
+
+Array.some()//只要数组中有一个满足条件就返回true，不继续对剩下的元素执行	
+```
+
+判断任意维
+
+```js
+function dimension(arr){
+	if(arr instanceof Array){
+        return Math.max(...arr.map(e=>{
+            return 1+dimension(e)
+        }))
+    }else{
+        return 0
+    }
+}
 ```
 
 
@@ -521,7 +546,30 @@ let strLength: number = (someValue as string).length;
 <Header currentpage="home" history={this.props.history}/>
 ```
 
+###### 3.页面传值
 
+​	1.url参数
+
+​	2.query/state
+
+​		route定义
+
+```jsx
+<Route path='/query' component={Query}/>
+```
+
+​		Link组件
+
+```jsx
+var query = {
+        pathname: '/query',
+        query: '我是通过query传值 '//可以是对象
+}
+
+<Link to={query}>query</Link>
+```
+
+​		参数获取：`this.props.location.query`
 
 # [webpack](https://webpack.docschina.org/concepts/)
 
@@ -617,7 +665,9 @@ plugins:[
 
 ​	只配置devserver可以实现自动刷新，但是是完全刷新的。
 
-​	[react插件react-hot-loader](https://github.com/gaearon/react-hot-loader)，使用babel的方式
+​	[react插件react-hot-loader](https://github.com/gaearon/react-hot-loader)，使用babel的方式（react懒加载）
+
+###### 8.publicPath
 
 # Git学习
 
@@ -862,11 +912,41 @@ pre{
 
 ​	方法1：父元素设置`overflow:hidden/auto`
 
+​	原理：触发父元素的BFC属性
+
+​	bfc特性：
+
+​	**a.阻止外边距折叠**
+
+​	**b.可以包含浮动的元素**
+
+​	**c.可以阻止元素被浮动元素覆盖**
+
 ​	方法2：父元素设置`::after{clear:both;content:'';display:block}`
 
 ###### 17.position:absolute/fixed
 
 ​	流式布局里，absolute的元素随着页面下拉会隐藏，但是fixed的元素会一直在窗口中
+
+###### 18.box-sizing:border-box
+
+​	**width(宽) + padding(内边距) + border(边框) = 元素实际宽度**
+
+​	**height(高) + padding(内边距) + border(边框) = 元素实际高度**
+
+设置该属性后padding和border就包含在实际设置的宽高中，即设置padding和border不会扩大元素宽高
+
+###### 19.设置两个class，要使css生效需要把两个类名连在一起写
+
+```css
+.class1.class2{//正确
+    
+}
+
+.class1 .class2{//错误
+    
+}
+```
 
 
 
@@ -903,6 +983,18 @@ path.relative(from,to)//返回从from到to的相对路径  例如：/data/heloo,
 ​	4.`nvm use version`
 
 ​	查看当前安装的node版本`nvm list`
+
+###### 3.eslint:代码检查、规范工具
+
+###### 4.node.js用法
+
+​	作为服务器端在大型项目中一般是作为中间层转发(web服务器)以及一些处理
+
+​	前端页面-->node（web）服务器-->后端（python、java等）
+
+​	![web架构](./web架构.png)
+
+​	node也可以作为后端使用，直接作为业务逻辑层处理数据返回给前端请求。**node.js适合运用在高并发、I/O密集、少量业务逻辑的场景**
 
 # react
 
@@ -1122,7 +1214,7 @@ localhost#id
 
 ​	1.rem
 
-
+###### 11.ssr一般只做首屏渲染（SEO优化）
 
 # 小程序开发
 
@@ -1171,3 +1263,4 @@ localhost#id
  myreg.test(15851899798)
 ```
 
+# pixi.js（bilibili跨年页面）
