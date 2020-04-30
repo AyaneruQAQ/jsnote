@@ -495,6 +495,19 @@ function dimension(arr){
 }
 ```
 
+###### 42.类装饰器
+
+```typescript
+// 装饰器的原理
+@decorator
+class A {}
+
+//等同于
+
+class A {}
+A = decorator(A) || A;
+```
+
 
 
 # TypeScript
@@ -671,7 +684,7 @@ plugins:[
 
 # Git学习
 
-1.git clone 克隆远程仓库
+1.git clone 克隆远程仓库,克隆特定分支加上-b branch_name
 
 2.创建自己的分支并切换到此分支： git checkout -b your_branch
 
@@ -1216,6 +1229,35 @@ localhost#id
 
 ###### 11.ssr一般只做首屏渲染（SEO优化）
 
+###### 12.antd form的自定义validator注意事项
+
+规则：
+
+1. 最后必须callback一个信息回来
+2. 如果效验时代码出错会导致全部规则失效
+
+```js
+validator:(rule: any, value:string, callback: Function) => {
+// if(!value){
+//     callback()
+// }
+//保证自定义validator一定不会出错从而导致表单提交的时候validateFieldsAndScroll无法执行
+//采用下面的try catch，或者像上面一样value为空时callback()
+//下面方法还有一个优点是在调试的时候可以定位错误，否则antd本身不会报哪个自定义
+//validator出错
+    try{
+        if(value.length>50){
+            callback('最多输入50字')
+        }else
+            callback()
+    }catch(err){
+        callback()
+    }
+}
+```
+
+**总结：就是每一种情况都要考虑到，否则就会出问题，为了避免自己逻辑不周全就直接采用try catch了**
+
 # 小程序开发
 
 ###### 1.小程序中使用weui
@@ -1262,5 +1304,13 @@ localhost#id
  var myreg = /^[1][3,4,5,7,8][0-9]{9}$/;
  myreg.test(15851899798)
 ```
+
+###### 2.校验固定电话
+
+```js
+let reg = /0\d{2,3}-\d{7,8}/
+```
+
+
 
 # pixi.js（bilibili跨年页面）
