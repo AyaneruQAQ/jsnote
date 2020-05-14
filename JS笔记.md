@@ -508,6 +508,31 @@ class A {}
 A = decorator(A) || A;
 ```
 
+###### 43.n维数组降维
+
+`let arr = [1,2,7,3,[3,4,[5,4,6]]]`
+
+```js
+Array.from(new Set(arr.flat(Infinity)))//降维去重
+```
+
+或
+
+```js
+function flatten(arr1){
+	return arr1.reduce((r,item)=>Array.isArray(item)?r.concat(flatten(item)):r.concat(item),[])
+}
+
+Array.from(new Set(flatten(arr)))
+```
+
+###### 44.数组排序
+
+```js
+Array.from(new Set(flatten(arr))).sort((a,b)=>{return a-b})
+//[1,2,3,4,5,6,7]
+```
+
 
 
 # TypeScript
@@ -755,19 +780,26 @@ overflow-x:hidden;
 
 ###### 2.多行文本设置垂直居中：
 
-```css
+不定宽高的盒子（son）水平垂直居中
 
-.wrapper {//外层
-	position: relative;
-	overflow: hidden;
+```html
+.parent{
+	position:relative;
+	height:100px;
+	width:100px;
 }
-.content_box {//文本部分
-	position: absolute;
-	top: 50%;
-	width: 300px;
-	height: 127px; /*本页面中这么多文字的高度，文本篇幅改变，高度也会变*/
-    margin-top: -63.5px;  /*height的一半*/
+.son{
+	positon:absolute;
+	top:50%;
+	left:50%;
+	transform:translate(-50%,-50%);
 }
+
+<div class="parent">
+    <div class="son">
+        文本
+    </div>
+</div>
 ```
 
 flex布局水平垂直居中
@@ -961,7 +993,11 @@ pre{
 }
 ```
 
+###### 20.回流，重绘
 
+当`Render Tree`中部分或全部元素的尺寸、结构、或某些属性发生改变时，浏览器重新渲染部分或全部文档的过程称为回流。
+
+当页面中元素样式的改变并不影响它在文档流中的位置时（例如：`color`、`background-color`、`visibility`等），浏览器会将新样式赋予给元素并重新绘制它，这个过程称为重绘。
 
 # vscode
 
