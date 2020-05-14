@@ -508,6 +508,31 @@ class A {}
 A = decorator(A) || A;
 ```
 
+###### 43.n维数组降维
+
+`let arr = [1,2,7,3,[3,4,[5,4,6]]]`
+
+```js
+Array.from(new Set(arr.flat(Infinity)))//降维去重
+```
+
+或
+
+```js
+function flatten(arr1){
+	return arr1.reduce((r,item)=>Array.isArray(item)?r.concat(flatten(item)):r.concat(item),[])
+}
+
+Array.from(new Set(flatten(arr)))
+```
+
+###### 44.数组排序
+
+```js
+Array.from(new Set(flatten(arr))).sort((a,b)=>{return a-b})
+//[1,2,3,4,5,6,7]
+```
+
 
 
 # TypeScript
@@ -755,19 +780,28 @@ overflow-x:hidden;
 
 ###### 2.多行文本设置垂直居中：
 
-```css
+**absolute是相对于该元素的第一个定位为非static的父元素**
 
-.wrapper {//外层
-	position: relative;
-	overflow: hidden;
+不定宽高的盒子（son）水平垂直居中
+
+```html
+.parent{
+	position:relative;
+	height:100px;
+	width:100px;
 }
-.content_box {//文本部分
-	position: absolute;
-	top: 50%;
-	width: 300px;
-	height: 127px; /*本页面中这么多文字的高度，文本篇幅改变，高度也会变*/
-    margin-top: -63.5px;  /*height的一半*/
+.son{
+	positon:absolute;
+	top:50%;
+	left:50%;
+	transform:translate(-50%,-50%);
 }
+
+<div class="parent">
+    <div class="son">
+        文本
+    </div>
+</div>
 ```
 
 flex布局水平垂直居中
@@ -941,6 +975,36 @@ pre{
 
 ​	流式布局里，absolute的元素随着页面下拉会隐藏，但是fixed的元素会一直在窗口中
 
+###### 17.positon:sticky（初始relative，达到条件变成fixed定位）
+
+页面滚动图片覆盖
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>JS Bin</title>
+  <style>
+      div{
+          position:sticky;
+          top:0;//条件
+      }  
+  </style>
+</head>
+<body>
+<div><img src="https://picsum.photos/id/10/480/360"></div>
+<div><img src="https://picsum.photos/id/11/480/360"></div>
+<div><img src="https://picsum.photos/id/12/480/360"></div>
+<div><img src="https://picsum.photos/id/13/480/360"></div>
+<div><img src="https://picsum.photos/id/14/480/360"></div>
+</body>
+</html>
+```
+
+
+
 ###### 18.box-sizing:border-box
 
 ​	**width(宽) + padding(内边距) + border(边框) = 元素实际宽度**
@@ -960,6 +1024,36 @@ pre{
     
 }
 ```
+
+###### 20.回流，重绘
+
+当`Render Tree`中部分或全部元素的尺寸、结构、或某些属性发生改变时，浏览器重新渲染部分或全部文档的过程称为**回流**。
+
+当页面中元素样式的改变并不影响它在文档流中的位置时（例如：`color`、`background-color`、`visibility`等），浏览器会将新样式赋予给元素并重新绘制它，这个过程称为**重绘**。
+
+**如何避免**
+
+**css**
+
+- 避免使用`table`布局。
+- 尽可能在`DOM`树的最末端改变`class`。
+- 避免设置多层内联样式。
+- 将动画效果应用到`position`属性为`absolute`或`fixed`的元素上。
+- 避免使用`CSS`表达式（例如：`calc()`）。
+
+**javascript**
+
+- 避免频繁操作样式，最好一次性重写`style`属性，或者将样式列表定义为`class`并一次性更改`class`属性。
+- 避免频繁操作`DOM`，创建一个`documentFragment`，在它上面应用所有`DOM操作`，最后再把它添加到文档中。
+- 也可以先为元素设置`display: none`，操作结束后再把它显示出来。因为在`display`属性为`none`的元素上进行的`DOM`操作不会引发回流和重绘。
+- 避免频繁读取会引发回流/重绘的属性，如果确实需要多次使用，就用一个变量缓存起来。
+- 对具有复杂动画的元素使用绝对定位，使它脱离文档流，否则会引起父元素及后续元素频繁回流。
+
+###### 21.top/margin-top
+
+​	top一般结合position:absolute使用（只在static时无效）
+
+​	margin-top一般结合position:relative使用
 
 
 
