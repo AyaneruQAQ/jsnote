@@ -533,6 +533,19 @@ Array.from(new Set(flatten(arr))).sort((a,b)=>{return a-b})
 //[1,2,3,4,5,6,7]
 ```
 
+###### 45.[object] instanceof [构造函数]
+
+​	若左侧为基本类型，则直接返回false，例如：`1 instanceof Number`，结果为false
+
+###### 46.typeof 返回一个字符串，表明类型
+
+​	注意：
+
+```js
+typeof [1,2,3] //"object"
+typeof null //"object"
+```
+
 
 
 # TypeScript
@@ -1087,6 +1100,12 @@ path.relative(from,to)//返回从from到to的相对路径  例如：/data/heloo,
 ​	4.`nvm use version`
 
 ​	查看当前安装的node版本`nvm list`
+
+​	**5.windows下nvm安装8.11以上版本的node，都不能自动安装好对应的npm！！**
+
+​	这会导致不能使用npm
+
+​	需要自己去下载对应的npm版本    [解决办法](https://blog.csdn.net/Deleven_Blog/article/details/100077732)
 
 ###### 3.eslint:代码检查、规范工具
 
