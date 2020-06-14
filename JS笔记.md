@@ -495,7 +495,7 @@ function dimension(arr){
 }
 ```
 
-
+###### 42.setTimeout(function,1000)，function一定不能立即执行，即不能加（）
 
 # TypeScript
 
@@ -674,6 +674,10 @@ plugins:[
 1.git clone 克隆远程仓库
 
 2.创建自己的分支并切换到此分支： git checkout -b your_branch
+
+​	创建并切换分支，同时指定远程仓库的源分支(创建的分支从远程clone，不是从当前分支) ：
+
+​	git checkout -b your_branch origin/branchname
 
 3.上传自己的分支到远程仓库：git push origin your_branch（本地）:your_branch（远程）
 
@@ -936,7 +940,7 @@ pre{
 
 设置该属性后padding和border就包含在实际设置的宽高中，即设置padding和border不会扩大元素宽高
 
-###### 19.设置两个class，要使css生效需要把两个类名连在一起写
+###### 19.为一个元素设置两个class，要使css生效需要把两个类名连在一起写
 
 ```css
 .class1.class2{//正确
@@ -948,7 +952,17 @@ pre{
 }
 ```
 
+###### 20.css ~ , +  >
 
+​	A~B:为所有和A具有相同父元素的B设置样式
+
+​	A+B:为紧邻着A的B设置样式，AB须有相同的父元素
+
+​	A B：选择A所有的后代B元素 
+
+​	A>B：选择A的一代B元素 
+
+​	A,B：为AB同时设置样式
 
 # vscode
 
@@ -1215,6 +1229,14 @@ localhost#id
 ​	1.rem
 
 ###### 11.ssr一般只做首屏渲染（SEO优化）
+
+
+
+###### 12.nginx
+
+​	重启服务nginx -s reload
+
+​	
 
 # 小程序开发
 
