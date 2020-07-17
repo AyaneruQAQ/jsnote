@@ -1,3 +1,9 @@
+
+
+
+
+
+
 # JS笔记
 
 ###### 1.js输出：
@@ -140,7 +146,7 @@ a.concat(4)
 //此时a=[1,2,3],没有改变
 ```
 
-
+​	**splice()会改变原数组**
 
 ###### 17.input框绑定键盘enter事件
 
@@ -159,6 +165,8 @@ onKeyDown={
 
 ```
 array.findIndex(这里填条件)
+
+array.indexOf(item)//返回下标
 ```
 
 ###### 19.js数据类型：
@@ -445,7 +453,7 @@ function ajax(method,suffix,data){
     })
 }
 
-ajax('GET','/user','')
+ajax('GET','/user','').then().catch()
 ```
 
 ###### 38.字符串加数字：把数字转成字符串拼接；字符串减数字：把字符串转成数字运算
@@ -591,7 +599,7 @@ let strLength: number = (someValue as string).length;
 
 ###### 1.onEnter()、onLeave()路由进入，离开时进行一些处理。v4已经移除
 
-###### 2.router的history只在route中挂载的组件中有定义，如果是公共组件，例如Header中要进行路由，需要在引用Header的组件中传递history属性
+###### 2.router的history只在route中挂载的组件中有定义，如果是公共组件，例如Header中要进行路由，需要在引用Header的组件中传递history属性,或者使用withrouter
 
 ```jsx
 <Header currentpage="home" history={this.props.history}/>
@@ -621,6 +629,18 @@ var query = {
 ```
 
 ​		参数获取：`this.props.location.query`
+
+###### 4.路由跳转的时候给出提示信息
+
+```jsx
+import {Prompt} from 'react-router-dom'
+<Prompt 
+  when={bool}
+  message={string/function}
+/>
+```
+
+
 
 # [webpack](https://webpack.docschina.org/concepts/)
 
@@ -832,14 +852,6 @@ align-items: center;     /* 垂直居中 */
 ```css
 style={{background:`url(${self.state.adpic})`}}
 ```
-
-###### 4.display:flex
-
-​	设置主轴（水平）对齐方式：justify-content
-
-​	设置垂直对齐方式：align-content
-
-​	如果设置了不能正常显示，可能是没有给容器设置宽高
 
 
 
@@ -1250,6 +1262,10 @@ HOC:**高阶组件是参数为组件，返回值为新组件的函数。**
 
 不能在HOC中修改子组件
 
+###### 11.react-router&react-router-dom
+
+
+
 # 其他
 
 ###### 1.浏览器缓存机制
@@ -1291,11 +1307,13 @@ HOC:**高阶组件是参数为组件，返回值为新组件的函数。**
 
 ​	**跨域并不是请求发不出去，请求能发出去，服务端能收到请求并正常返回结果，只是结果被浏览器拦截了**
 
-​	jsonp只支持get请求
+**解决方式：**
 
-​	**跨域资源共享（CORS）**:主要是服务端设置
+​	1.jsonp只支持get请求
 
-​	nginx反向代理
+​	2.**跨域资源共享（CORS）**（静态资源？）:nginx设置response-header
+
+​	3.nginx反向代理（http请求，nginx做转发）
 
 ​		正向代理：代理客户端
 
@@ -1353,8 +1371,8 @@ validator:(rule: any, value:string, callback: Function) => {
 // }
 //保证自定义validator一定不会出错从而导致表单提交的时候validateFieldsAndScroll无法执行
 //采用下面的try catch，或者像上面一样value为空时callback()
-//下面方法还有一个优点是在调试的时候可以定位错误，否则antd本身不会报哪个自定义
-//validator出错
+//下面方法还有一个优点是在调试的时候可以定位错误，否则antd本身不会报哪个自定义validator出错
+
     try{
         if(value.length>50){
             callback('最多输入50字')
@@ -1367,6 +1385,22 @@ validator:(rule: any, value:string, callback: Function) => {
 ```
 
 **总结：就是每一种情况都要考虑到，否则就会出问题，为了避免自己逻辑不周全就直接采用try catch了**
+
+###### 13.path-to-regexp使用
+
+```jsx
+var pathToRegexp = require('path-to-regexp')
+
+var reg = pathToRegexp(url) //把url转换成正则表达式，返回转换后的正则表达式
+reg.exec(url)//匹配
+pathToRegexp.parse(url)//解析url参数
+
+var url = '/user/:id/:name'
+var data = {id: 10001, name: 'bob'}
+pathToRegexp.compile(url)(data)//输出/user/10001/bob
+```
+
+
 
 # 小程序开发
 
