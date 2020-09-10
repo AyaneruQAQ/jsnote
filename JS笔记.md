@@ -557,8 +557,45 @@ typeof [1,2,3] //"object"
 typeof null //"object"
 ```
 
+###### 47.各种循环break
 
->>>>>>> b7a212b736dce33db3a6a859b7fe16c1081ab0bd
+```js
+let a = [1,2,3,4,5,6]
+//不会break
+a.eachChild(item=>{
+  if(item ===3){
+    return
+  }
+  console.log(item)
+})
+
+//可以break
+for(let i = 0;i<a.length;i++){
+  if(a[i] === 3){
+    break
+  }
+  console.log(a[i])
+}
+//可以break
+a.every(item=>{
+  if(item ===3){
+    return false
+  }else{
+    console.log(item) 
+    return true
+  }
+})
+//可以break
+a.some(item=>{
+  if(item ===3){
+    return true
+  }
+  console.log(item)//1，2，true
+})
+
+```
+
+
 
 # TypeScript
 
@@ -809,6 +846,12 @@ git clone -b branchname ssh://....
 ```
 
 20.git stash暂存    git stash pop（弹出：出栈）/apply(取出，不出栈)
+
+# Gerrit
+
+abandon会丢掉当前patch set所在的change，慎用！
+
+git pull是从git仓库拉的  不是gerrit
 
 # CSS问题
 
@@ -1069,7 +1112,7 @@ pre{
 
 ​	A>B：选择A的一代B元素 
 
-​	A,B：为AB同时设置样式
+	A,B：为AB同时设置样式
 =======
 ###### 20.回流，重绘
 
