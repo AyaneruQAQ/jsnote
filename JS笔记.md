@@ -888,6 +888,8 @@ git reset --mixed HEAD^ //撤销commit，撤销git add .
 
 23.git log --pretty=format:"%h %s" --graph（以树状图形式展示分支、合并历史）
 
+24.`git tag -a v1.0`
+
 # Gerrit
 
 abandon会丢掉当前patch set所在的change，慎用！
