@@ -595,6 +595,15 @@ a.some(item=>{
 
 ```
 
+###### 48.js删除对象的某一属性
+
+```js
+let obj = {
+	attr1:11
+}
+delete obj.attr1
+```
+
 
 
 # TypeScript
@@ -847,11 +856,51 @@ git clone -b branchname ssh://....
 
 20.git stash暂存    git stash pop（弹出：出栈）/apply(取出，不出栈)
 
+21.git导出commit日志,[参数参考](https://git-scm.com/docs/pretty-formats)
+
+```
+ git log --pretty=format:"%h %an %as %s %b"  --encoding=gbk >log.csv
+
+%h   简略hash
+
+```
+
+中文乱码时设置
+
+```
+ git config --global i18n.logOutputEncoding gbk
+```
+
+但这个设置会使git log输出乱码，可以用下面恢复
+
+```
+ git config --global i18n.logOutputEncoding utf-8
+```
+
+
+
+22.撤销commit
+
+```
+git reset --soft HEAD^ //撤销commit，不撤销git add .
+git reset --mixed HEAD^ //撤销commit，撤销git add .
+```
+
+23.git log --pretty=format:"%h %s" --graph（以树状图形式展示分支、合并历史）
+
 # Gerrit
 
 abandon会丢掉当前patch set所在的change，慎用！
 
 git pull是从git仓库拉的  不是gerrit
+
+gerrit不允许跳过change合并
+
+git checkout 特定的文件
+
+
+
+git push origin HEAD:refs/for/develop
 
 # CSS问题
 
@@ -1144,6 +1193,19 @@ pre{
 ​	top一般结合position:absolute使用（只在static时无效）
 
 ​	margin-top一般结合position:relative使用
+
+###### 22.禁用浏览器缩放（只缩放目标元素）
+
+```css
+#app{
+    touch-action:none
+}
+```
+
+###### 23.margin:auto
+
+​	若只设置左右一边`margin-right:auto`则对应外边距占满所有可用空间
+
 # vscode
 
 ###### 1.替换所有文件中的某一匹配项
@@ -1329,7 +1391,28 @@ HOC:**高阶组件是参数为组件，返回值为新组件的函数。**
 
 ###### 11.react-router&react-router-dom
 
+# vue
 
+###### 1.vue是响应式的，但不能响应数组和对象内部变化（直接赋值），若要实现响应可按下面操作
+
+```js
+//对象
+Vue.set(vm.someObject, 'b', 2)  
+this.$set(this.someObject,'b',2) //this.$set是全局vue.set的别名
+this.someObject = Object.assign({}, this.someObject, { a: 1, b: 2 })//需将两者合并到一个新的空对象中才行，否则Object.assign(this.someObject, { a: 1, b: 2 })也不会触发更新
+
+//数组
+//Vue 不能检测以下数组的变动：
+//当你利用索引直接设置一个数组项时，例如：vm.items[indexOfItem] = newValue
+//当你修改数组的长度时，例如：vm.items.length = newLength
+//用vue的set方法或数组的splice方法改变数组
+Vue.set(this.items, indexOfItem, newValue)
+this.items.splice(indexOfItem, 1, newValue)
+```
+
+###### 2.nextTick（）
+
+​	在下次 DOM 更新循环结束之后执行**延迟回调**。
 
 # 其他
 
@@ -1475,6 +1558,24 @@ var data = {id: 10001, name: 'bob'}
 pathToRegexp.compile(url)(data)//输出/user/10001/bob
 ```
 
+###### 14.[svg path](https://segmentfault.com/a/1190000009556665)
+
+```vue
+<svg width="100%" height="100%">
+ <path d="M0,0 L240,0 L240,240 L0,240 Z" fill="#fff" stroke="#000" stroke-width="10" transform="translate(5,5)"></path>
+</svg>
+M = moveto(M X,Y) ：将画笔移动到指定的坐标位置
+L = lineto(L X,Y) ：画直线到指定的坐标位置
+H = horizontal lineto(H X)：画水平线到指定的X坐标位置
+V = vertical lineto(V Y)：画垂直线到指定的Y坐标位置
+C = curveto(C X1,Y1,X2,Y2,ENDX,ENDY)：三次贝赛曲线
+S = smooth curveto(S X2,Y2,ENDX,ENDY)：平滑曲率
+Q = quadratic Belzier curve(Q X,Y,ENDX,ENDY)：二次贝赛曲线
+T = smooth quadratic Belzier curveto(T ENDX,ENDY)：映射
+A = elliptical Arc(A RX,RY,XROTATION,FLAG1,FLAG2,X,Y)：弧线
+Z = closepath()：关闭路径
+```
+
 
 
 # 小程序开发
@@ -1528,6 +1629,14 @@ pathToRegexp.compile(url)(data)//输出/user/10001/bob
 
 ```js
 let reg = /0\d{2,3}-\d{7,8}/
+```
+
+###### 3.正则匹配
+
+```js
+let reg = /([0-9]+)/g //加括号返回匹配的所有值
+let str = '123,456,666'
+str.match(reg) //输出['123','456','666']
 ```
 
 
