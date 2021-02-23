@@ -503,9 +503,7 @@ function dimension(arr){
 }
 ```
 
-<<<<<<< HEAD
 ###### 42.setTimeout(function,1000)，function一定不能立即执行，即不能加（）
-=======
 ###### 42.类装饰器
 
 ```typescript
@@ -548,7 +546,7 @@ Array.from(new Set(flatten(arr))).sort((a,b)=>{return a-b})
 
 ​	若左侧为基本类型，则直接返回false，例如：`1 instanceof Number`，结果为false
 
-###### 46.typeof 返回一个字符串，表明类型
+###### 46.typeof 返回一个字符串，表明类型（只能判断基本数据类型）
 
 ​	注意：
 
@@ -562,7 +560,7 @@ typeof null //"object"
 ```js
 let a = [1,2,3,4,5,6]
 //不会break
-a.eachChild(item=>{
+a.forEach(item=>{
   if(item ===3){
     return
   }
@@ -602,9 +600,142 @@ let obj = {
 	attr1:11
 }
 delete obj.attr1
+//最好按以下方式设置
+obj.attr1 = ''  
 ```
 
+###### 49.es6的单例写法
 
+```js
+class Db {
+    //ES6类的静态方法（只能直接由类名调用的方法）：static getInstance
+    //ES6类的静态属性：直接挂载在类名上的方法，如：Db.instance()
+    static getInstance() {
+        if (!Db.instance) {
+            Db.instance = new Db();
+            return Db.instance
+        }
+        return Db.instance;
+    }
+    constructor(name, age) {
+        this.name = name;
+        this.age = age;
+        //在constructor里面可以初始化地（对象一创建就开始）运行对象的方法
+        this.connect()
+    }
+    connect() {
+        console.log("I am sillyB,我连接上了数据库")
+    }
+    find() {
+        console.log("查询数据库")
+    }
+}
+//单例模式创建对象时，不再使用类直接创建对象，而是使用类名调用类的静态方法来创建（或返回）对象
+var db1 = Db.getInstance()
+var db2 = Db.getInstance()
+var db3 = Db.getInstance()
+db1.find()
+db2.find()
+db3.find()
+/*结果：
+I am sillyB,我连接上了数据库
+查询数据库
+查询数据库
+查询数据库*/
+```
+
+###### 50.js取整
+
+Math.round()在小数部分恰好等于0.5的时候舍入到相邻的正无穷方向上的整数，会导致例如
+
+Math.round(-1.5)  //-1
+
+所以需要在这种情况做一下处理
+
+```js
+function round(num){
+      if(num.toString().indexOf('.')<0){
+        return num
+      }else{//负数，且小数部分刚好是0.5
+        let abs_num = Math.abs(num)
+        let a = abs_num-Math.floor(abs_num)
+        if(num<0&&a===0.5){
+          return Math.round(num)-1
+        }else{
+          return Math.round(num)
+        }
+      }
+    }
+```
+
+###### 60.toString()检测对象类型：Object.prototype.toString.call(thisArg)
+
+```js
+var toString = Object.prototype.toString;
+
+toString.call(new Date); // [object Date]  字符串
+toString.call(new String); // [object String]
+toString.call(Math); // [object Math]
+
+//Since JavaScript 1.8.5
+toString.call(undefined); // [object Undefined]
+toString.call(null); // [object Null]
+```
+
+###### 61.[Object.assign()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/assign)
+
+###### 62.es6链判断运算符  ?.
+
+​	**存在定义则继续调用，否则返回undefined**
+
+​	三种用法
+
+```
+obj?.prop
+obj?.[expression]
+func?.()
+```
+
+​	如果读取对象内部的某个属性，往往需要判断一下该对象是否存在，例：
+
+```
+const  firstName = message.body.user.firstName  //错误写法，如果内部不存在对应属性，则会报错
+const firstName = (message
+  && message.body
+  && message.body.user
+  && message.body.user.firstName) || 'default'; // 正确的写法
+const  firstName = message?.body?.user?.firstName ?? 'default' //es6正确写法
+```
+
+​	判断方法是否存在，存在就执行
+
+```
+const a = 0
+a?.()   // Uncaught TypeError: a is not a function
+
+const a = ()=>{console.log(1)}
+a?.()  // 1
+```
+
+###### 63.es6null判断运算符  ??
+
+读取对象属性的时候，如果某个属性的值是`null`或`undefined`，有时候需要为它们指定默认值。常见做法是通过`||`运算符指定默认值。
+
+```javascript
+const a = ''
+const c = a || 'Hello, world!'; //c='Hello, world!'
+```
+
+上面代码通过`||`运算符指定默认值，但是这样写是错的。开发者的原意是，只要属性的值为`null`或`undefined`，默认值就会生效，但是这里属性的值如果为空字符串或`false`或`0`，默认值也会生效。
+
+为了避免这种情况，[ES2020](https://github.com/tc39/proposal-nullish-coalescing) 引入了一个新的 Null 判断运算符`??`。它的行为类似`||`，但是只有运算符左侧的值为`null`或`undefined`时，才会返回右侧的值。
+
+```javascript
+const a = ''
+const c = a ?? 'Hello, world!';  //c=''
+```
+
+上面代码中，默认值只有在左侧属性值为`null`或`undefined`时，才会生效。
 
 # TypeScript
 
@@ -790,6 +921,12 @@ plugins:[
 
 ###### 8.publicPath
 
+###### 9.hash、chunkhash、contenthash区别
+
+<img src="D:\projects\jsnote\image-20210105104738748.png" alt="image-20210105104738748" style="zoom:80%;" />
+
+![image-20210105104733343](C:\Users\EDZ\AppData\Roaming\Typora\typora-user-images\image-20210105104733343.png)
+
 # Git学习
 
 1.git clone 克隆远程仓库,克隆特定分支加上-b branch_name
@@ -856,6 +993,13 @@ git clone -b branchname ssh://....
 
 20.git stash暂存    git stash pop（弹出：出栈）/apply(取出，不出栈)
 
+```
+git stash show //显示stash的内容（每个文件的差异+++++-----）
+git stash show -p //显示具体的更改（每一行）
+```
+
+
+
 21.git导出commit日志,[参数参考](https://git-scm.com/docs/pretty-formats)
 
 ```
@@ -888,7 +1032,25 @@ git reset --mixed HEAD^ //撤销commit，撤销git add .
 
 23.git log --pretty=format:"%h %s" --graph（以树状图形式展示分支、合并历史）
 
-24.`git tag -a v1.0`
+24.打tag
+
+```
+git tag -a v1.0 //可以添加附注
+git tag v1.0 //轻量级，无需添加附注
+git tag -d v1.0//删除tag
+```
+
+25.git describe --long --dirty --tag
+
+如果不加--tag则只显示带注释的标签
+
+26.[git clone fatal: Authentication failed for "xxx"](https://blog.csdn.net/yphust/article/details/100542265)
+
+27.git reflog
+
+Reference logs, or "reflogs", record when the tips of branches and other references were updated in the **local repository**
+
+记录本地所有变更历史
 
 # Gerrit
 
@@ -903,6 +1065,15 @@ git checkout 特定的文件
 
 
 git push origin HEAD:refs/for/develop
+
+设置直接git push，在`.git/config`中编辑，新增
+
+```
+[remote "origin"]
+	push = refs/heads/*:refs/for/*
+```
+
+
 
 # CSS问题
 
@@ -1147,12 +1318,11 @@ pre{
     
 }
 
-.class1 .class2{//错误
+.class1 .class2{//错误，这是父子选择
     
 }
 ```
 
-<<<<<<< HEAD
 ###### 20.css ~ , +  >
 
 ​	A~B:为所有和A具有相同父元素的B设置样式
@@ -1163,8 +1333,9 @@ pre{
 
 ​	A>B：选择A的一代B元素 
 
+​	AB：为同时有ab两个类名的元素设置样式
+
 	A,B：为AB同时设置样式
-=======
 ###### 20.回流，重绘
 
 当`Render Tree`中部分或全部元素的尺寸、结构、或某些属性发生改变时，浏览器重新渲染部分或全部文档的过程称为**回流**。
@@ -1180,7 +1351,6 @@ pre{
 - 避免设置多层内联样式。
 - 将动画效果应用到`position`属性为`absolute`或`fixed`的元素上。
 - 避免使用`CSS`表达式（例如：`calc()`）。
->>>>>>> b7a212b736dce33db3a6a859b7fe16c1081ab0bd
 
 **javascript**
 
@@ -1207,6 +1377,12 @@ pre{
 ###### 23.margin:auto
 
 ​	若只设置左右一边`margin-right:auto`则对应外边距占满所有可用空间
+
+###### 24.伪元素、伪类
+
+伪类单冒号
+
+伪元素建议都使用双冒号
 
 # vscode
 
@@ -1324,8 +1500,6 @@ this.state.show&&<div/>//要确保this.state.show为布尔值，不能是0，0�
 
 ###### 5.Fragment标签
 
-​	
-
 ```jsx
 <React.Fragment></React.Fragment>
 //可以用空标签代替使用，如下。但是空标签不能添加key和属性
@@ -1415,6 +1589,40 @@ this.items.splice(indexOfItem, 1, newValue)
 ###### 2.nextTick（）
 
 ​	在下次 DOM 更新循环结束之后执行**延迟回调**。
+
+###### 3.按需引入lodash
+
+1. 安装
+
+   ```
+   npm install lodash --save
+   npm install lodash-webpack-plugin babel-plugin-lodash --save-dev
+   ```
+
+   2.修改babel配置
+
+```
+"plugins": ["lodash"]
+```
+
+3.修改webpack配置
+
+```
+const LodashModuleReplacementPlugin = require('lodash-webpack-plugin')
+  plugins: [
+    new LodashModuleReplacementPlugin()
+  ]
+```
+
+###### 4.事件传参
+
+```vue
+@change($event,others)  //$event是默认参数
+```
+
+###### 5.$attrs
+
+​	子组件接收到的
 
 # 其他
 
@@ -1507,15 +1715,12 @@ localhost#id
 
 ###### 11.ssr一般只做首屏渲染（SEO优化）
 
-<<<<<<< HEAD
-
 
 ###### 12.nginx
 
 ​	重启服务nginx -s reload
 
 ​	
-=======
 ###### 12.antd form的自定义validator注意事项
 
 规则：
@@ -1544,7 +1749,6 @@ validator:(rule: any, value:string, callback: Function) => {
 ```
 
 **总结：就是每一种情况都要考虑到，否则就会出问题，为了避免自己逻辑不周全就直接采用try catch了**
->>>>>>> b7a212b736dce33db3a6a859b7fe16c1081ab0bd
 
 ###### 13.path-to-regexp使用
 
@@ -1577,6 +1781,8 @@ T = smooth quadratic Belzier curveto(T ENDX,ENDY)：映射
 A = elliptical Arc(A RX,RY,XROTATION,FLAG1,FLAG2,X,Y)：弧线
 Z = closepath()：关闭路径
 ```
+
+
 
 
 
