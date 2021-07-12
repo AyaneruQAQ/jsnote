@@ -215,7 +215,7 @@ function a(){
 	}
 	b();  //调用b
 }
- 
+
 new a(); //新建一个a对象，此时alert name undefined
 ```
 
@@ -423,7 +423,11 @@ co(foo).then(()=>{
 
 ```js
 let add = (a)=>(b)=>a+b
+let add = function(){
+    
+}
 add(1)(2)//3
+
 ```
 
 ###### 36.form的onSubmit会默认刷新页面，使用e.preventDefault()可以阻止自动刷新
@@ -737,6 +741,91 @@ const c = a ?? 'Hello, world!';  //c=''
 
 上面代码中，默认值只有在左侧属性值为`null`或`undefined`时，才会生效。
 
+###### 64.js数据类型
+
+基本数据类型Number、String、Boolean、Symbol、Undefined、Null
+
+引用数据类型Object，包括Funtion、Array
+
+###### 65.判断点击事件是否在一个元素内
+
+```js
+document.addEventListener('click', (e) => {
+	const target = document.getElementById('target')
+	if(target == e.target||target.contain(e.target)){
+		//在目标元素内部
+	}else{
+		//不在
+	}
+}
+```
+
+###### 66.函数简写
+
+```js
+const ff = x=>x*2
+//相当于
+const ff = x=>{return x*2}
+```
+
+###### 67.防抖、节流简单实现
+
+```js
+const debounce = function(func,ms){
+    let timer = ''
+    return ()=>{
+		if(timer){
+            clearTimeout(timer)
+        }
+        timer = setTimeout(func,ms)
+    }
+}
+
+const throttle = function(func,ms){
+    let flag = true
+    return ()=>{
+        if(!flag) return
+        flag = false
+        setTimeout(()=>{
+            func()
+            flag = true
+        },1000)
+    }
+}
+```
+
+###### 68.this指向问题
+
+普通函数中的this指向调用者，即调用时才确定
+
+箭头函数中的this在定义时就确定了，即定义时所在作用域指向的对象
+
+**注：对象不构成作用域**
+
+###### 69.new
+
+1.创建空对象
+
+2.将空对象的__proto__指向构造函数的原型对象
+
+3.将构造函数的this指向创建的对象
+
+4.返回该对象
+
+```js
+function Test(a) {
+	this.a = a
+}
+
+const t = new Test('aa')
+//等价于
+let obj = {}
+obj.__proto__ = Test.prototype
+const t = Test.call(obj,'aa')
+```
+
+
+
 # TypeScript
 
 ###### 1.ts中一个数组中的元素类型必须一致
@@ -927,6 +1016,69 @@ plugins:[
 
 ![image-20210105104733343](C:\Users\EDZ\AppData\Roaming\Typora\typora-user-images\image-20210105104733343.png)
 
+###### 10.打包分析
+
+```
+npm run build -- --report
+```
+
+###### 11.require.context()
+
+如果想引入一个文件夹下面的所有文件，或者引入能匹配一个正则表达式的所有文件，这个功能就会很有帮助
+
+```js
+const context =  require.context('./components',false,/\.vue$/) //三个参数：文件夹，是否搜索子目录，匹配文件的正则
+
+let m = {}
+context.keys().forEach((key)=>{
+    m[key] = context(key)
+})
+```
+
+###### 12.vue官方提供的自动化全局注册方式(require.context())
+
+```js
+import Vue from 'vue'
+import upperFirst from 'lodash/upperFirst'
+import camelCase from 'lodash/camelCase'
+
+const requireComponent = require.context(
+  // 其组件目录的相对路径
+  './components',
+  // 是否查询其子目录
+  false,
+  // 匹配基础组件文件名的正则表达式
+  /Base[A-Z]\w+\.(vue|js)$/
+)
+
+requireComponent.keys().forEach(fileName => {
+  // 获取组件配置
+  const componentConfig = requireComponent(fileName)
+
+  // 获取组件的 PascalCase 命名
+  const componentName = upperFirst(
+    camelCase(
+      // 获取和目录深度无关的文件名
+      fileName
+        .split('/')
+        .pop()
+        .replace(/\.\w+$/, '')
+    )
+  )
+
+  // 全局注册组件
+  Vue.component(
+    componentName,
+    // 如果这个组件选项是通过 `export default` 导出的，
+    // 那么就会优先使用 `.default`，
+    // 否则回退到使用模块的根。
+    componentConfig.default || componentConfig
+  )
+})
+```
+
+
+
 # Git学习
 
 1.git clone 克隆远程仓库,克隆特定分支加上-b branch_name
@@ -936,6 +1088,11 @@ plugins:[
 ​	创建并切换分支，同时指定远程仓库的源分支(创建的分支从远程clone，不是从当前分支) ：
 
 ​	git checkout -b your_branch origin/branchname
+
+```bash
+创建一个全新的分支（不包含历史提交记录），git checkout --orphan test
+删除所有文件  git rm -rf .
+```
 
 3.上传自己的分支到远程仓库：git push origin your_branch（本地）:your_branch（远程）
 
@@ -955,7 +1112,7 @@ plugins:[
 
 9.git创建ssh  `ssh-keygen -t rsa -C “邮箱”`，然后复制.ssh/id_rsa.pub里的内容，添加到github账户里
 
-10.git pull拉远程分支，冲突但不想手动一个个解决冲突（此时也无法切换到别的分支），使用git merge --abort可以回复到pull之前的状态
+10.git pull拉远程分支，冲突但不想手动一git 个个解决冲突（此时也无法切换到别的分支），使用git merge --abort可以回复到pull之前的状态
 
 11.`git rebase dev`:把dev分支的改动合并到当前分支
 
@@ -996,6 +1153,7 @@ git clone -b branchname ssh://....
 ```
 git stash show //显示stash的内容（每个文件的差异+++++-----）
 git stash show -p //显示具体的更改（每一行）
+git stash show -p stash@{1} //显示特定的某个stash，注意在vscode中执行可能出错，要在git bash中执行
 ```
 
 
@@ -1051,6 +1209,13 @@ git tag -d v1.0//删除tag
 Reference logs, or "reflogs", record when the tips of branches and other references were updated in the **local repository**
 
 记录本地所有变更历史
+28.git push失败，提示输密码http://www.79tui.com/happy/741509.html
+
+29.gitignore
+
+忽略某个动态生成名字的文件夹
+
+/dist*
 
 # Gerrit
 
@@ -1394,6 +1559,14 @@ pre{
 
 ​	添加插件后可以在这个文件自定义插件的配置
 
+###### 3.中文匹配
+
+```
+(.[\u4E00-\u9FA5]+)|([\u4E00-\u9FA5]+.)
+```
+
+
+
 # node.js
 
 ###### 1.path
@@ -1622,7 +1795,11 @@ const LodashModuleReplacementPlugin = require('lodash-webpack-plugin')
 
 ###### 5.$attrs
 
-​	子组件接收到的
+​	子组件接收到的非props属性
+
+# vue3.0
+
+###### 1.v-model?
 
 # 其他
 
@@ -1782,9 +1959,71 @@ A = elliptical Arc(A RX,RY,XROTATION,FLAG1,FLAG2,X,Y)：弧线
 Z = closepath()：关闭路径
 ```
 
+###### 15.复制chrome控制台变量
 
+```
+javascript:(function(){
+	document.addEventListener('copy', function fn(e){
+		document.removeEventListener(e.type,fn);
+		let data = JSON.stringify(temp1);
+		console.log('开始拷贝')
+		e.clipboardData.setData('text/plain',data);
+		e.clipboardData.setData('text/html', data);
+		e.preventDefault();
+		console.log('拷贝成功')
+		console.log(data)
+	});
+	// 自动触发复制事件,低版本浏览器不支持的事件
+	 document.execCommand('copy');
+})()
+```
 
+###### 16.fetch()/axios
 
+fetch是es6中新提出的api，是xhr的替代方案
+
+axios是基于xhr封装的库
+
+###### 17.http短连接、长连接
+
+tcp：传输层
+
+http：应用层
+
+七层：物理层、数据链路层、网络层、传输层、会话层、表示层、应用层
+
+**实质上是tcp的短连接和长连接**
+
+短连接：每次建立http连接都需要重新建立tcp连接
+
+长连接：可以复用已建立的tcp连接，开启长连接，指定header的connection：keep-alive（http/1.1默认为keep-alive）
+
+###### 18.Date.now()  vs new Date().getTime()
+
+都返回时间戳，但前者比后者快
+
+```
+let t1 = new Date()
+setTimeout(()=>{
+	t2 = t1.getTime()
+},200)
+
+//若按上述写，t2获得的时间戳为t1声明时的时间
+```
+
+###### 19.package.json
+
+```
+"vue":"2.5.2",  指定2.5.2版本
+"vue":"~2.5.2",  2.5.2以上但小于2.6的最新版本，即不改变主要和次要版本号
+"vue":"^2.5.2",  2.5.3以上但小于3.0的最新版本，即不改变主要版本号
+```
+
+###### 20.elementui的 button文字不居中，可能是因为宽度太小
+
+###### 21.本地存储
+
+indexDB:localForage
 
 # 小程序开发
 
@@ -1853,4 +2092,36 @@ str.match(reg) //输出['123','456','666']
 
 
 
-test
+# 工具
+
+gif制作工具screentogif
+
+json比较工具 beyondcompare
+
+###### 生成目录树插件
+
+```
+npm install -g tree-node-cli
+
+treee -L 3 -I "node_modules|.idea|objects|.git" -a --dirs-first
+```
+
+
+
+# 前端撤销重做逻辑设计
+
+![](undo&redo.png)
+
+
+
+# qiankun
+
+状态下发，从父应用的vuex中获取值，在对应的store中调用qiankun的setGlobalState
+
+微应用内路由跳转失败：父应用劫持了路由变化，导致子应用无法跳转
+
+
+
+**子应用webpack-dev-server配置代理无效？**
+
+子应用发出的请求被主应用劫持，因此需要在主应用中也配置子应用所需的代理
