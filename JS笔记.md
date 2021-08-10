@@ -789,7 +789,7 @@ const throttle = function(func,ms){
         setTimeout(()=>{
             func()
             flag = true
-        },1000)
+        },ms)
     }
 }
 ```
@@ -824,7 +824,9 @@ obj.__proto__ = Test.prototype
 const t = Test.call(obj,'aa')
 ```
 
+###### 70.!!
 
+强制转换成boolean类型，判断非空
 
 # TypeScript
 
@@ -1077,6 +1079,22 @@ requireComponent.keys().forEach(fileName => {
 })
 ```
 
+###### 13.DefinePlugin
+
+在webpack打包编译过程中，会把使用到**定义的全局变量**的地方直接替换为该变量的值
+
+```
+new wepack.DefinePlugin({
+	VERSION:'123'
+})
+
+//打包前
+let data = VERSION
+
+//打包后
+let data = '123'
+```
+
 
 
 # Git学习
@@ -1211,11 +1229,13 @@ Reference logs, or "reflogs", record when the tips of branches and other referen
 记录本地所有变更历史
 28.git push失败，提示输密码http://www.79tui.com/happy/741509.html
 
-29.gitignore
+29.查看远程仓库
 
-忽略某个动态生成名字的文件夹
+```
+git remote -v
+```
 
-/dist*
+
 
 # Gerrit
 
@@ -1838,9 +1858,13 @@ const LodashModuleReplacementPlugin = require('lodash-webpack-plugin')
 
 ​	复杂的用js
 
-###### 6.跨域
+###### 6.[跨域](https://segmentfault.com/a/1190000009971254)
 
-​	**跨域并不是请求发不出去，请求能发出去，服务端能收到请求并正常返回结果，只是结果被浏览器拦截了**
+	跨域请求分两种：`简单请求和预检请求`。
+
+一次完整的请求不需要服务端预检，直接响应的，归为简单请求；而响应前需要预检的，称为预检请求，只有预检请求通过，才有接下来的简单请求
+
+**跨域并不是请求发不出去，请求能发出去，服务端能收到请求并正常返回结果，只是结果被浏览器拦截了**
 
 **解决方式：**
 
@@ -1984,7 +2008,7 @@ fetch是es6中新提出的api，是xhr的替代方案
 
 axios是基于xhr封装的库
 
-###### 17.http短连接、长连接
+###### 17.http短连接、长连接、短轮询、长轮询
 
 tcp：传输层
 
@@ -1997,6 +2021,12 @@ http：应用层
 短连接：每次建立http连接都需要重新建立tcp连接
 
 长连接：可以复用已建立的tcp连接，开启长连接，指定header的connection：keep-alive（http/1.1默认为keep-alive）
+
+短轮询：客户端定时轮询，服务器立刻返回结果
+
+长轮询：客户端定时轮询，服务端结果有更新时才返回
+
+**长短连接是通过http协议的请求头设置的，长短轮询是服务器的处理方式决定的**
 
 ###### 18.Date.now()  vs new Date().getTime()
 
