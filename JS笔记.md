@@ -789,7 +789,7 @@ const throttle = function(func,ms){
         setTimeout(()=>{
             func()
             flag = true
-        },ms)
+        },1000)
     }
 }
 ```
