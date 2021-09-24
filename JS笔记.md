@@ -798,7 +798,7 @@ const throttle = function(func,ms){
 
 普通函数中的this指向调用者，即调用时才确定
 
-箭头函数中的this在定义时就确定了，即定义时所在作用域指向的对象
+箭头函数中的this在定义生效时就确定了，即定义时所在作用域指向的对象
 
 **注：对象不构成作用域**
 
@@ -1235,8 +1235,6 @@ Reference logs, or "reflogs", record when the tips of branches and other referen
 git remote -v
 ```
 
-
-
 # Gerrit
 
 abandon会丢掉当前patch set所在的change，慎用！
@@ -1568,6 +1566,71 @@ pre{
 伪类单冒号
 
 伪元素建议都使用双冒号
+
+###### 25.flex 
+
+flex是flex-grow,flex-shrink,flex-basis的缩写
+
+默认值为 0 1 auto
+
+**`flex-basis`属性定义了在分配多余空间之前，项目占据的主轴空间**
+
+**当一个元素同时被设置了 `flex-basis` (除值为 `auto` 外) 和 `width`, `flex-basis` 具有更高的优先级.**
+
+```html
+<div class="p">
+    <div class="c1"></div>
+    <div class="c2"></div>
+</div>
+
+.p{
+	display:flex;
+	width:600px;
+}
+.c1{
+	flex:1;
+	width:200px;
+}
+.c2{
+	flex:1;
+	width:100px;
+}
+//结果还是c1 c2均分p，因为flex-basis为0，此时width不生效
+
+.c1{
+	flex:1 1 auto;
+	width:200px;
+}
+.c2{
+	flex:1 1 auto;
+	width:100px;
+}
+//c1 350px = 200+150  c2 250px = 100+150：除去两者自身宽度，剩余宽度均分
+
+.c1{
+	flex:1;
+	width:200px;
+}
+.c2{
+	flex:1 1 auto;
+	width:100px;
+}
+//c1 250px  c2 350px = 100+250 :c1 flex-basis为0，width不生效  c2为auto，width生效，则整体减去c2宽度再均分
+```
+
+
+
+```
+flex:1   =  flex:1 1 0
+flex:auto = flex:1 1 auto
+flex:none = flex:0 0 auto
+```
+
+space-around  每个元素两侧相等
+
+space-between  两侧元素顶边，中间元素同space-evenly
+
+space-evenly  所有间隔相等
 
 # vscode
 
@@ -2055,6 +2118,10 @@ setTimeout(()=>{
 
 indexDB:localForage
 
+###### 22.validator.js
+
+校验库，避免自己写一些不合理的正则
+
 # 小程序开发
 
 ###### 1.小程序中使用weui
@@ -2155,3 +2222,31 @@ treee -L 3 -I "node_modules|.idea|objects|.git" -a --dirs-first
 **子应用webpack-dev-server配置代理无效？**
 
 子应用发出的请求被主应用劫持，因此需要在主应用中也配置子应用所需的代理
+
+
+
+```js
+//一个数组只有1和3组成，求和为n时可能的数组总数
+//例n=4，则有三种[1,1,1,1],[1,3],[3,1]
+function fn(n){
+  let l = Math.floor(n/3)
+  let res = 1 //0个3
+  for(let i=1;i<=l;i++){
+    let j = n-3*i+1 //数组元素总数
+    res += getR(j,i)
+  }
+  return res
+}
+
+function getR(n,m){
+  let r = 1
+  let r1 = 1
+  for(let i=0;i<m;i++){
+    r = r*(n-i)
+    r1 = r1*(i+1)
+  }
+  return r/r1
+}
+fn(4) //3
+```
+
