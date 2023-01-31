@@ -865,7 +865,14 @@ let someValue: any = "this is a string";
 let strLength: number = (someValue as string).length;
 ```
 
+```typescript
+<string>someValue;
+someValue as string
+```
 
+###### 4.ts高级类型
+
+omit<T,U>排除接口中的指定属性，例：omit<I1,'a'|'b'>,排除接口I1中的a和b属性
 
 # react-router
 
@@ -920,7 +927,35 @@ import {Prompt} from 'react-router-dom'
 
 ​	主要问题是配置loader的时候要按顺序写。style-loader、css-loader、less-loader
 
-###### 2.create-react-app搭建的脚手架，需要run eject才能暴露出配置文件
+###### 2.webpack-dev-server动态修改代理
+
+即不需重启项目就可以切换代理地址,主要是利用[http-proxy-middleware](https://github.com/chimurai/http-proxy-middleware)的router属性
+
+- 在项目根目录中创建proxy.env，写入代理地址
+
+  ```
+  https://localhost: 3000/
+  ```
+
+- 配置devserver的proxy如下
+
+  ```js
+  devServer: {
+    proxy: [
+      {
+        context: ['/api'],
+        target: 'https://localhost: 3000/',
+        // 解决切换分支（本质是切换代理）需要重启项目的问题
+        // 修改代理只需要修改proxy.env中的地址即可，router配置会覆盖target
+        router: () => {
+           return fs.readFileSync(process.cwd() + '/proxy.env', 'utf8');
+        },
+      }
+    ]
+  }
+  ```
+
+  
 
 ###### 3.webpack entry
 
@@ -1021,7 +1056,7 @@ plugins:[
 ###### 10.打包分析
 
 ```
-npm run build -- --report
+yarn add webpack-bundle-analyzer -D
 ```
 
 ###### 11.require.context()
@@ -1031,9 +1066,9 @@ npm run build -- --report
 ```js
 const context =  require.context('./components',false,/\.vue$/) //三个参数：文件夹，是否搜索子目录，匹配文件的正则
 
-let m = {}
-context.keys().forEach((key)=>{
-    m[key] = context(key)
+//默认使用模块的default export
+const m = context.keys().map(v=>{
+  return context(v).default
 })
 ```
 
@@ -1234,6 +1269,23 @@ Reference logs, or "reflogs", record when the tips of branches and other referen
 ```
 git remote -v
 ```
+
+30.合并多个提交为一个提交
+
+```
+git rebase -i HEAD~2 //合并最近两个提交
+git push --force
+```
+
+31.git reset HEAD~n  后退n步
+
+32.
+
+```
+git reset --hard origin/master  //将当前分支重置到远程master分支的最新提交
+```
+
+
 
 # Gerrit
 
@@ -1632,6 +1684,43 @@ space-between  两侧元素顶边，中间元素同space-evenly
 
 space-evenly  所有间隔相等
 
+
+
+###### 26.点状网格背景 radial-gradient
+
+
+
+```css
+background-image: radial-gradient(circle, #3030304d 10%, transparent 11%);
+background-size: 20px 20px;
+
+```
+
+###### 27.一行n个卡片，流式排列
+
+例一行3个卡片：
+
+```less
+.parent{
+	display: flex
+  flex-wrap: wrap;
+  .child{
+    margin-bottom: 24px;
+   	flex: 0 0 32%;
+  }
+  .child:nth-child(3n+2){
+    margin-left: 2%;
+    margin-right: 2%; // 32+2+32+2+32 = 100
+  }
+}
+```
+
+###### 28.多行标题吸顶
+
+分别获取各标题的offsetTop,如果scrollTop位于第i个标题的offsetTop和第i+1个标题的offsetTop之间时，第i个标题设置吸顶
+
+
+
 # vscode
 
 ###### 1.替换所有文件中的某一匹配项
@@ -1646,6 +1735,15 @@ space-evenly  所有间隔相等
 
 ```
 (.[\u4E00-\u9FA5]+)|([\u4E00-\u9FA5]+.)
+```
+
+###### 4.正则匹配并替换
+
+例如要把所有intl.t('文字')格式的代码替换成'文字'
+
+```
+// 正则表达式如下，用()包裹的部分表示匹配到的子表达式，依次为$1,$2...
+intl.t\((.*)\)
 ```
 
 
@@ -1770,7 +1868,7 @@ this.state.show&&<div/>//要确保this.state.show为布尔值，不能是0，0�
 
 ###### 8.Hook(函数组件中使用state等特性)
 
-​	hooks必须写在函数最外层，不能写在ifelse等语句中。因为useState是根据顺序来赋值的，如果有条件判断会出错
+​	hooks必须写在函数最外层，不能写在ifelse等条件语句中。因为state是根据hook调用顺序对应关联的，如果有条件判断会出错
 
 ```jsx
 let tof = true
@@ -1822,6 +1920,118 @@ HOC:**高阶组件是参数为组件，返回值为新组件的函数。**
 不能在HOC中修改子组件
 
 ###### 11.react-router&react-router-dom
+
+###### 12.useEffect()第二个参数
+
+不传：组件初始化和更新时都会执行
+
+传`[]`：只在初始化的时候执行一次
+
+###### 13.react同一页面内多级路由
+
+![image-20220224164632474](/Users/4paradigm/Documents/project/jsnote/image-20220224164632474.png)
+
+以上图为例，是一个四级路由的实现。
+
+实现方式：
+
+1. 在router中注册一到四级的路由，各级路由的组件都设置为该多级路由的根页面，在这里为systemSetting
+
+   ```js
+   {
+   	path: '/setting',
+     component: () => import('./routes/systemSetting'), //systemSetting是该多级路由挂载的页面
+   },
+   {
+     path: '/setting/decisionCenter',
+     component: () => import('./routes/systemSetting'),
+   },
+   {
+     path: '/setting/decisionCenter/auth',
+     component: () => import('./routes/systemSetting'),
+   },
+   {
+     path: '/setting/decisionCenter/auth/role',
+     component: () => import('./routes/systemSetting'),
+   }
+   ```
+
+2. 在各级页面中逐级导航
+
+   ```jsx
+   // systemSetting.js
+   import { Switch, Route, Redirect } from 'react-router-dom';
+   import DecisionCenter from 'decisionCenter.js'; //决策中心页面
+   import DataAnalyze from '';
+   
+   function (){
+     
+     return (
+       <>
+     		<Menu>菜单</Menu>  // 菜单项:图中的决策中心、数据分析
+       	<Switch>
+         	<Route path='/setting/decisionCenter' component={DecisionCenter}/>
+           <Route path='/setting/dataAnalyze' component={DataAnalyze}/>
+       	</Switch>
+       </>
+     )
+   }
+   
+   //decisionCenter.js
+   import AuthLayout from 'AuthLayout.js';  //认证授权页面
+   funtion () {
+     
+     return (
+     	<>
+       	<Menu>菜单</Menu>  //图中的系统设置、认证授权、日志管理、监控dashboard
+       	<Switch>
+         	<Route />
+         	<Route path='/setting/decisionCenter/auth' component={AuthLayout}/>
+         	<Route />
+         	<Route />
+       	</Switch>
+       </>
+     )
+   }
+   
+   //AuthLayout.js
+   import Role from 'role.js';  //角色管理页面
+   funtion () {
+     
+     return (
+     	<>
+       	<Menu>菜单</Menu>  //图中的机构管理、角色管理、用户管理
+       	<Switch>
+         	<Route />
+         	<Route path='/setting/decisionCenter/auth/role' component={Role}/>
+         	<Route />
+       	</Switch>
+       </>
+     )
+   }
+   ```
+
+   以访问角色管理页面为例：则先导航到systemSetting页面，继续匹配，导航到decisionCenter页面，再继续匹配，直到路由完全匹配。
+
+###### Create-react-app中使用svg
+
+无需添加额外loader，官方提供使用方式：
+
+https://create-react-app.dev/docs/adding-images-fonts-and-files/#adding-svgs
+
+
+
+# 状态管理
+
+状态管理模块不要滥用，有需求的地方使用，比如某变量需要全局共享。若数据只被单个组件（以及其子组件）使用，则将其放于该组件的state中即可。
+
+## ~~redux~~
+
+##### Redux toolkit
+
+## recoil
+
+
 
 # vue
 
@@ -2122,6 +2332,35 @@ indexDB:localForage
 
 校验库，避免自己写一些不合理的正则
 
+###### 23.项目CHANGELOG实践
+
+commit规范参考：https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#-git-commit-guidelines%E4%BE%8B%E5%A6%82
+
+git CHANGELOG插件：https://github.com/conventional-changelog/conventional-changelog/tree/master/packages/conventional-changelog-cli
+
+
+
+###### 24.前端反审查
+
+https://github.com/fz6m/console-ban/blob/master/README.zh.md
+
+###### 25.[代码commit规范](https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#-git-commit-guidelines%E4%BE%8B%E5%A6%82)
+
+- **feat**: A new feature
+- **fix**: A bug fix
+- **docs**: Documentation only changes
+- **style**: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
+- **refactor**: A code change that neither fixes a bug nor adds a feature
+- **perf**: A code change that improves performance
+- **test**: Adding missing or correcting existing tests
+- **chore**: Changes to the build process or auxiliary tools and libraries such as documentation generation
+
+
+
+###### 26.emotion.js
+
+一个css-in-js的库
+
 # 小程序开发
 
 ###### 1.小程序中使用weui
@@ -2165,7 +2404,7 @@ indexDB:localForage
 ###### 1.校验电话号码
 
 ```js
- var myreg = /^[1][3,4,5,7,8][0-9]{9}$/;
+ var myreg = /^[1][3,4,5,6,7,8,9][0-9]{9}$/;
  myreg.test(15851899798)
 ```
 
@@ -2250,3 +2489,10 @@ function getR(n,m){
 fn(4) //3
 ```
 
+
+
+# 场景实例
+
+## 文件切片上传和断点续传
+
+https://juejin.cn/post/6844904046436843527#heading-0
