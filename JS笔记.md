@@ -1183,6 +1183,8 @@ let data = '123'
 
 ​    本地分支与远程分支建立关联：`git push --set-upstream origin your_branch`，建立	关联之后后面就可以直接push了（不用后缀）
 
+​	`git branch -vv` 可查看本地分支与哪个远程分支关联
+
 4.直接拉取远程分支：`git pull origin branch_name`
 
 5.git fetch和git pull的区别：fetch获取不合并，pull获取且合并
@@ -1271,6 +1273,7 @@ git stash show -p stash@{1} //显示特定的某个stash，注意在vscode中执
 ```
 git reset --soft HEAD^ //撤销commit，不撤销git add .
 git reset --mixed HEAD^ //撤销commit，撤销git add .
+git reset --hard HEAD~n  //重置到当前分支head前的第n个提交，用~
 ```
 
 23.git log --pretty=format:"%h %s" --graph（以树状图形式展示分支、合并历史）
@@ -1318,27 +1321,6 @@ git reset --hard origin/master  //将当前分支重置到远程master分支的�
 ```
 
 
-
-# Gerrit
-
-abandon会丢掉当前patch set所在的change，慎用！
-
-git pull是从git仓库拉的  不是gerrit
-
-gerrit不允许跳过change合并
-
-git checkout 特定的文件
-
-
-
-git push origin HEAD:refs/for/develop
-
-设置直接git push，在`.git/config`中编辑，新增
-
-```
-[remote "origin"]
-	push = refs/heads/*:refs/for/*
-```
 
 
 
@@ -1828,6 +1810,14 @@ path.relative(from,to)//返回从from到to的相对路径  例如：/data/heloo,
 
 ​	node也可以作为后端使用，直接作为业务逻辑层处理数据返回给前端请求。**node.js适合运用在高并发、I/O密集、少量业务逻辑的场景**
 
+###### 5.npm安装包不适用本地缓存
+
+```
+npm i @boss/price --prefer-online -S // 强制npm304检查，对比本地缓存与服务器最新数据
+```
+
+
+
 # react
 
 ###### 1.父组件调用子组件内部方法: useImperativeHandle
@@ -2201,6 +2191,38 @@ const LodashModuleReplacementPlugin = require('lodash-webpack-plugin')
 
 ​	子组件接收到的非props属性
 
+###### 6. .native
+
+###### 7.vue修改elementui默认样式
+
+两种情况
+
+**最终渲染在当前组件内**
+
+```vue
+<style scoped>
+    :deep(.el-xx) {
+		//...
+    }
+</style>
+```
+
+**最终渲染后插在根元素(body)中**，例如dialog、select下拉框等
+
+给el元素增加popper-class='my-class'，然后在非scoped样式中修改
+
+```vue
+<style>
+    .my-class .el-xx {
+     	//...       
+    }
+</style>
+```
+
+
+
+
+
 # vue3.0
 
 ###### 1.v-model?
@@ -2222,7 +2244,7 @@ const LodashModuleReplacementPlugin = require('lodash-webpack-plugin')
 
 ###### 2.特性
 
-1. vite将代码区分为源码和依赖，依赖利用http强缓存机制（cache-control）提高开发室的页面重载速度
+1. vite将代码区分为源码和依赖，依赖利用http强缓存机制（cache-control）提高开发时的页面重载速度
 2. 构建时，自动css代码分割
 3. 
 
@@ -2515,6 +2537,41 @@ http://www.dailichun.com/2018/01/21/js_singlethread_eventloop.html
 - 宏任务执行完毕后，立即执行当前微任务队列中的所有微任务（依次执行）
 - 当前宏任务执行完毕，开始检查渲染，然后GUI线程接管渲染
 - 渲染完毕后，JS线程继续接管，开始下一个宏任务（从事件队列中获取）
+
+
+
+###### 28.浏览器内容到系统剪切板
+
+```typescript
+const copyText = (val: any) => {
+  // clipboard需要在安全环境下才能使用，比如https、localhost
+  if (navigator.clipboard && window.isSecureContext) {
+    // navigator clipboard 向剪贴板写文本
+    navigator.clipboard.writeText(val).then(() => {
+      ElMessage.success('复制成功');
+    });
+  } else {// execCommand是已经被废弃的特性，但大多数浏览器目前支持
+    // 创建text area
+    const textArea = document.createElement('textarea');
+    textArea.value = val;
+    // 使text area不在viewport，同时设置不可见
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    ElMessage.success('复制成功');
+    new Promise(() => {
+      // 执行复制命令并移除文本框
+      document.execCommand('copy');
+      textArea.remove();
+    }).then(() => {
+      ElMessage.success('复制成功');
+    });
+  }
+};
+
+```
+
+
 
 # 小程序开发
 
