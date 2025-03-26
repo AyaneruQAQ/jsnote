@@ -864,6 +864,16 @@ const t = Test.call(obj,'aa')
 
 强制转换成boolean类型，判断非空
 
+###### 71.改变url但不刷新页面的方法
+
+传参后需要去掉query内容,即改变路由但页面不刷新
+
+```js
+history.replaceState(null, '', window.location.href.split('?')[0]);
+```
+
+
+
 # TypeScript
 
 ###### 1.ts中一个数组中的元素类型必须一致
@@ -1741,6 +1751,68 @@ clip-path使用裁剪方式创建元素的可显示区域。区域内的部分�
 
 支持一些基础图形，还支持SVG路径规则绘制，即path
 
+
+
+###### 30.镂空文字 - 展示背景
+
+该div元素只在文字区域展示背景
+
+```css
+div{
+	color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+```
+
+
+
+###### 31.进度条实现方式
+
+利用背景颜色的位置偏移实现
+
+```html
+<div>
+  <p>正在安装...</p>
+</div>
+```
+
+```css
+div {
+  margin: auto;
+  width: fit-content;
+  border-radius: 10px;
+  background: linear-gradient(to right, #25cb93 50%, #d0ece5 50%) left/200% 100%;
+  background-position-x: 100%;
+
+  animation: bg-pos 5s infinite;
+
+  @keyframes bg-pos {
+    to {
+      background-position-x: 0;
+    }
+  }
+
+  > p {
+    padding: 5px 25px;
+    color: transparent;
+
+    background: linear-gradient(to right, white 50%, #25cb93 50%) left/200% 100%;
+
+    background-position-x: 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+
+    animation: bg-pos 5s infinite;
+  }
+}
+
+```
+
+
+
+
+
 # vscode
 
 ###### 1.替换所有文件中的某一匹配项
@@ -1814,6 +1886,76 @@ path.relative(from,to)//返回从from到to的相对路径  例如：/data/heloo,
 
 ```
 npm i @boss/price --prefer-online -S // 强制npm304检查，对比本地缓存与服务器最新数据
+```
+
+###### 6.代码高亮js库 - highlight.js
+
+
+
+###### 7.peerDependencies
+
+
+
+###### 8.npm淘宝镜像
+
+https://registry.npmmirror.com/
+
+
+
+###### 9.http-proxy-middleware 代理 修改返回结果
+
+```js
+ '/ali-upload': {
+    target: hosts.ALI_FILE,
+    changeOrigin: true,
+    selfHandleResponse: true, // 必须设置，否则不生效
+    pathRewrite: {
+      '^/ali-upload': '/ali/upload'
+    },
+    onProxyRes(proxyRes, req, res) {
+      const chunks = []
+      proxyRes.on('data', (chunk) => {
+        chunks.push(chunk)
+      });
+      proxyRes.on('end', () => {
+        try {
+          const body = JSON.parse(Buffer.concat(chunks).toString());
+          let files = body.map(file => {
+            return {
+              ...file,
+              url: getFileUrl(file)
+            }
+          })
+          const buffer = Buffer.from(JSON.stringify(files))
+          res.setHeader('Content-Type', proxyRes.headers['content-type']);
+          res.setHeader('Content-Length', buffer.length);
+          res.end(buffer)
+        } catch (error) {
+          console.log(error);
+        }
+      })
+    },
+  }
+```
+
+###### 10.修复lockfile
+
+```
+pnpm install --fix-lockfile
+```
+
+###### 11.渲染markdown文档
+
+```jsx
+import marked from 'marked';
+import sanitizeHtml from 'sanitize-html';
+
+async function Page({page}) {
+  // NOTE: loads *during* render, when the app is built.
+  const content = await file.readFile(`${page}.md`);
+  
+  return <div>{sanitizeHtml(marked(content))}</div>;
+}
 ```
 
 
@@ -2096,6 +2238,78 @@ const [rows, setRows] = useState(createRows(props));  //每次重新渲染时都
 const [rows, setRows] = useState(() => createRows(props));  //只会在首次渲染时计算一次初始值
 ```
 
+
+
+## Nextjs
+
+next会根据获取数据的方式自动判断一个页面的类型，最终生成的结果可能是多种渲染类型混合的项目
+
+###### 预渲染
+
+使用`getServerSideProps`或`getStaticProps`获取数据，则会判定为可预渲染页面
+
+next pre-render(预渲染)有两种类型：ssr & ssg（static site generation）
+
+###### 客户端渲染
+
+如果页面中使用了`useEffect`，则next会判定该页面为客户端渲染页面
+
+
+
+## react19
+
+###### 1.context优化
+
+```jsx
+// before
+const ThemeContext = createContext('');
+
+function App({children}) {
+  return (
+    <ThemeContext.Provider value="dark">
+      {children}
+    </ThemeContext.Provider>
+  );  
+}
+
+//after
+const ThemeContext = createContext('');
+
+function App({children}) {
+  return (
+    <ThemeContext value="dark">
+      {children}
+    </ThemeContext>
+  );  
+}
+
+```
+
+###### 2.`use`
+
+
+
+###### 3.support for document metadata
+
+```jsx
+function BlogPost({post}) {
+  return (
+    <article>
+      <h1>{post.title}</h1>
+      <title>{post.title}</title>
+      <meta name="author" content="Josh" />
+      <link rel="author" href="https://twitter.com/joshcstory/" />
+      <meta name="keywords" content={post.keywords} />
+      <p>
+        Eee equals em-see-squared...
+      </p>
+    </article>
+  );
+}
+```
+
+但建议还是使用`react-helmet`
+
 # 状态管理
 
 状态管理模块不要滥用，有需求的地方使用，比如某变量需要全局共享。若数据只被单个组件（以及其子组件）使用，则将其放于该组件的state中即可。
@@ -2226,6 +2440,25 @@ const LodashModuleReplacementPlugin = require('lodash-webpack-plugin')
 # vue3.0
 
 ###### 1.v-model?
+
+
+
+###### defineProps默认值
+
+```
+defineProps<{
+  showAll: boolean;
+  showKeys: string[];
+}>()
+```
+
+如果没有使用 `withDefaults`显式的指定默认值，则会根据js的规则默认把boolean类型的值设置为false
+
+
+
+###### computed没有执行？
+
+**computed属性只有在被使用时才会被计算**：即使你的依赖项已经变化，如果computed属性没有在模板中或其他响应式上下文中被引用，它也不会重新计算。确保在模板或其他响应式函数中使用了computed属性。
 
 
 
@@ -2670,6 +2903,10 @@ Ctrl + r        显示：号提示，根据用户输入查找相关历史命令�
 Ctrl + w        删除从光标位置前到当前所处单词（Word）的开头
 Ctrl + y        粘贴最后一次被删除的单词
 ```
+
+
+
+###### 超级好用的翻译软件DeepL
 
 
 
