@@ -757,25 +757,15 @@ const a = ()=>{console.log(1)}
 a?.()  // 1
 ```
 
-###### 63.es6null判断运算符  ??
+###### 63.es6空值合并操作符  ??与||的区别
 
-读取对象属性的时候，如果某个属性的值是`null`或`undefined`，有时候需要为它们指定默认值。常见做法是通过`||`运算符指定默认值。
+**`??` 只对 `null`/`undefined` 生效，而逻辑或 `||` 会对所有「假值」（`0`、`''`、`false`、`NaN`、`null`、`undefined`）生效 —— 这是两者最关键的区别，也是 `??` 解决的核心痛点。**
 
 ```javascript
 const a = ''
 const c = a || 'Hello, world!'; //c='Hello, world!'
+const c = a ?? 'hello' // c=''
 ```
-
-上面代码通过`||`运算符指定默认值，但是这样写是错的。开发者的原意是，只要属性的值为`null`或`undefined`，默认值就会生效，但是这里属性的值如果为空字符串或`false`或`0`，默认值也会生效。
-
-为了避免这种情况，[ES2020](https://github.com/tc39/proposal-nullish-coalescing) 引入了一个新的 Null 判断运算符`??`。它的行为类似`||`，但是只有运算符左侧的值为`null`或`undefined`时，才会返回右侧的值。
-
-```javascript
-const a = ''
-const c = a ?? 'Hello, world!';  //c=''
-```
-
-上面代码中，默认值只有在左侧属性值为`null`或`undefined`时，才会生效。
 
 ###### 64.js数据类型
 
@@ -1258,7 +1248,7 @@ git stash show -p stash@{1} //显示特定的某个stash，注意在vscode中执
 21.git导出commit日志,[参数参考](https://git-scm.com/docs/pretty-formats)
 
 ```
- git log --pretty=format:"%h %an %as %s %b"  --encoding=gbk >log.csv
+ git log --author="zhikai.luo" --pretty=format:"%h %an %as %s %b"  --encoding=gbk >log.csv
 
 %h   简略hash
 
@@ -1809,9 +1799,25 @@ div {
 
 ```
 
+###### 32.使元素保持固定的宽高比
 
+```css
+{
+	aspect-ratio: 2/1  width:height始终保持2:1
+}
+```
 
+###### 33. fit-content
 
+min(max-content, max(min-content, available-length))
+
+解释（以宽度为例）： 
+
+若可用宽度处于[min, max]之间，则元素宽度为可用宽度；
+
+否则为min（可用宽度小于min）或者max（可用宽度大于max）；
+
+若没设置min-width, max-width，则元素宽度为可用宽度
 
 # vscode
 
@@ -1938,11 +1944,20 @@ https://registry.npmmirror.com/
   }
 ```
 
-###### 10.修复lockfile
+###### 10.指定项目pnpm版本
 
-```
-pnpm install --fix-lockfile
-```
+1.node版本>=16.17
+2.命令行执行`corepack enable`
+3.package.json中增加配置`"packageManager": "pnpm@8.3.1"`
+按上述配置好之后，在本项目中使用pnpm命令时则会使用8.3.1版本
+
+**何时会更新 pnpm-lock.yaml？**
+| 操作 | 是否更新 lock 文件？ |
+|------|---------------------|
+| pnpm install（无参数） | ✅ 是（若 package.json 发生变更） |
+| pnpm install --frozen-lockfile | ❌ 否（强制锁定） |
+| pnpm add lodash@4.17.21 | ✅ 是（直接修改 package.json 和 lock 文件） |
+| pnpm update | ✅ 是（升级依赖版本并更新 lock 文件） |
 
 ###### 11.渲染markdown文档
 
